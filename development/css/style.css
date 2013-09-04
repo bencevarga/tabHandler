@@ -45,7 +45,7 @@ a {
 }
 
 .tabTitle {
-	color: rgb(204, 204, 204);
+	color: black; /* rgb(204, 204, 204);*/
 }
 
 .tabListUrl {
