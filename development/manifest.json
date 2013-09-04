@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+
+  "name": "tabHandler",
+  "description": "blabla",
+  "version": "1.0",
+
+  "permissions": ["tabs","notifications","http://*/*", "https://*/*"],
+  
+  "browser_action": {
+    "default_icon": "img/icon.png"
+    //"default_popup": "index.html"
+  },
+  
+  "background" : {
+  	"persistent" : false,
+  	"scripts" : ["js/bg.js"]
+  }
+}
