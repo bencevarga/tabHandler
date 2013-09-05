@@ -50,13 +50,15 @@ var tabHandler;
 
 	function createTabListElementContent(tab, groupId) {
 
-		var link = jQuery("<a href=''><span class='tabTitle'>" + tab.title + "</span></a>");
-
-		var settings = jQuery('<div class="settings"></div>').appendTo(link);
+		var link = jQuery("<a href=''></a>");
+		var title = jQuery("<span class='tabTitle'>" + tab.title + "</span>");
+		
+		var settings = jQuery('<div class="settings"></div>');
 		var dropDownHandler = jQuery("<div class='handler'></div>");
-		settings.append(dropDownHandler);
-
 		var url = jQuery('<span class="tabListUrl">' + tab.url + '</span>');
+		title.appendTo(link);
+		settings.appendTo(link);
+		dropDownHandler.appendTo(settings);	
 		url.appendTo(link);
 
 		link.click({tab : tab}, highlightTab);
@@ -72,6 +74,8 @@ var tabHandler;
 								.append(favicon).append(link)),
 				link : link,
 				settings : settings,
+				favicon : favicon,
+				title : title,
 				url : url
 			}
 		});
@@ -88,16 +92,19 @@ var tabHandler;
 		return tabListElement;
 	}
 	function highlightTab(event) {
-		e.preventDefault();
-		chrome.tabs.highlight({
-			tabs : [ e.data.tab.index ]
-		}, function() {
-		});
+		event.preventDefault();
+		
+		chrome.tabs.get(event.data.tab.id,function(tab){	
+			chrome.tabs.highlight({
+				tabs : [ tab.index ]
+			}, function() {}); 
+		})
+		
 	}
 	function addCategory() {
 		var tabGroup = jQuery('<div class="tabGroup"></div>').appendTo(
 				tabsContainer);
-
+		addCategoryTitle(tabGroup); 
 		var tabsList = jQuery('<ol id=list' + groupId + ' class="tabList"><ol>')
 				.sortable({
 					connectWith : ".tabList",
@@ -110,6 +117,10 @@ var tabHandler;
 
 		return tabsList;
 
+	}
+	function addCategoryTitle(tabGroup){
+		var categoryTitle = jQuery("<div class='categoryTitle'><input type='text'/><div>").appendTo(tabGroup);
+		
 	}
 	function handleDropEvent(event, ui) {
 		if (_grabbedRow != null) {
@@ -126,9 +137,14 @@ var tabHandler;
 	}
 	function refreshListElement(tabId, changeInfo, tab){
 		var parentGroup = getGroupByTab(tab);
-		var updatedTablistElement = parentGroup.tabs[tab.id];
-		console.info("updatedTablistElement: ",updatedTablistElement.htmlElements.url.value(""));
-		
+		if(null != parentGroup){
+			var updatedTablistElement = parentGroup.tabs[tab.id];
+			console.info("updatedTablistElement: ",updatedTablistElement.htmlElements);
+			updatedTablistElement.htmlElements.title.html(tab.title);
+			updatedTablistElement.htmlElements.url.html(tab.url);
+			updatedTablistElement.htmlElements.favicon.attr("src",tab.favIconUrl);
+			
+		}
 	}
 	function getGroupByTab(tab) {
 		for ( var key in tabGroups) {

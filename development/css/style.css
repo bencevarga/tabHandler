@@ -6,12 +6,13 @@
 body {
 	margin: 0px;
 	background: url("/img/bg.png");
+	font-family: "myriadpro";
 }
 
 #tabsContainer {
 	padding: 20px 20px 0px 20px;
-	font-family: "myriadpro";
-	margin-top: 40px;
+	
+	margin-top: 60px;
 }
 
 #tabsContainer ol {
@@ -29,10 +30,29 @@ a {
 	padding: 10px;
 	overflow: hidden;
 	white-space: nowrap;
-	margin-bottom: 20px;
+	margin-bottom: 40px;
 	background-color: rgba(255, 255, 255, 0.05);
 }
-
+.categoryTitle{
+	background-color: black;
+	min-width: 150px;
+	height:30px;
+	position:absolute;
+	margin-top: -40px;
+	background-color : rgb(71, 125, 194);
+}
+.categoryTitle input{
+	background: none;
+	border: none;
+	text-align: center;
+	padding-top: 5px;
+	font-weight: bold;
+}
+.categoryTitle input:focus{
+	/* background-color: red; */
+	height:100%;
+	padding-top: 0px;
+}
 .tabGroup ol {
 	-webkit-margin-start: 0px;
 	-webkit-margin-before: 0px;
