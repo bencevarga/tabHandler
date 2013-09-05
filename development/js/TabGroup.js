@@ -5,5 +5,7 @@ var TabGroup = function TabGroup(groupId,htmlElement) {
 };
 
 TabGroup.prototype = {
-	name : "New Group"
+	name : "New Group",
+	default: false,
+	title: null
 }
