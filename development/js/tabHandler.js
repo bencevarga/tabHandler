@@ -4,9 +4,7 @@ var tabHandler;
 	};
 	var tabsContainer;
 	var groupId = 0;
-	var tabGroups = {
-
-	};
+	var tabGroups = [];
 	_grabbedRow = null;
 	TabHandler.prototype = {
 		init : function() {
@@ -103,7 +101,7 @@ var tabHandler;
 		
 	}
 	function addGroup() {
-		var tabGroup = jQuery('<div id=tabGroup' + groupId + ' class="tabGroup"></div>').appendTo(tabsContainer);
+		var tabGroup = jQuery('<div id=tabGroup' + groupId + ' class="tabGroup"></div>');
 		addGroupTitle(tabGroup); 
 		var tabsList = jQuery('<ol class="tabList"><ol>')
 				.sortable({
@@ -112,8 +110,14 @@ var tabHandler;
 					dropOnEmpty : true,
 					stop : handleDropEvent
 				}).disableSelection().appendTo(tabGroup);
-
-		tabGroups[groupId] = new TabGroup(groupId++, tabGroup);
+				
+		if(typeof tabsContainer.children()[0] == "undefined"){
+			tabsContainer.append(tabGroup);
+		}else {
+			jQuery(tabsContainer.children()[0]).before(tabGroup);
+		}
+		
+		tabGroups.push(new TabGroup(groupId++, tabGroup));
 
 		return tabsList;
 
@@ -129,7 +133,7 @@ var tabHandler;
 				console.info("delete default: ",newTitle);
 				tabGroup.title = newTitle;
 				tabGroup.default = false;
-			}else if(newTitle == "" && getDefaultGroup().id == null){
+			}else if(newTitle == "" && getDefaultGroup() == null){
 				console.info("sadasdasd: ",newTitle);
 				tabGroup.default = true;
 			}
@@ -170,7 +174,16 @@ var tabHandler;
 									.appendTo(tabsList);
 	}
 	function getGroupByTab(tab) {
-		for ( var key in tabGroups) {
+		for (var i = 0;i<tabGroups.length; i++) {
+			for ( var tabKey in tabGroups[i].tabs) {
+				if (tabGroups[i].tabs.hasOwnProperty(tabKey)) {
+					if (tab.id == tabGroups[i].tabs[tabKey].tab.id) {
+						return tabGroups[i];
+					}
+				}
+			}
+		}
+		/* for ( var key in tabGroups) {
 			if (tabGroups.hasOwnProperty(key)) {
 				for ( var tabKey in tabGroups[key].tabs) {
 					if (tabGroups[key].tabs.hasOwnProperty(tabKey)) {
@@ -180,25 +193,36 @@ var tabHandler;
 					}
 				}
 			}
-		}
+		} */
 		return null;
 	}
 	function getGroupByElement(element) {
-		for ( var key in tabGroups) {
+		for(var i = 0;i<tabGroups.length; i++){
+			if (tabGroups[i].htmlElement.attr("id") == element.attr("id")) {
+				return tabGroups[i];
+			}
+		}
+	
+		/* for ( var key in tabGroups) {
 			if (tabGroups.hasOwnProperty(key)) {
 				if (tabGroups[key].htmlElement.attr("id") == element.attr("id")) {
 					return tabGroups[key];
 				}
 			}
-		}
+		} */
 		return null;
 	}
 	function getDefaultGroup(){
-		for ( var key in tabGroups) {
+		for ( var i = 0;i<tabGroups.length; i++) {
+			if ( tabGroups[i].default) {
+				return tabGroups[i];
+			}
+		}
+		/* for ( var key in tabGroups) {
 			if (tabGroups.hasOwnProperty(key) && tabGroups[key].default) {
 				return tabGroups[key];
 			}
-		}
+		 }*/
 		return null;
 	}
 	
