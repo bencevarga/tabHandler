@@ -117,8 +117,16 @@ var tabHandler;
 			jQuery(tabsContainer.children()[0]).before(tabGroup);
 		}
 		
-		tabGroups.push(new TabGroup(groupId++, tabGroup));
-
+		var newTabGroup = new TabGroup(groupId++, tabGroup);
+		tabGroups.push(newTabGroup);
+		
+		var defaultGroup = getDefaultGroup();
+		if(defaultGroup != null){
+			defaultGroup.default = false;
+		}
+				
+		newTabGroup.default = true;
+		
 		return tabsList;
 
 	}
@@ -132,9 +140,21 @@ var tabHandler;
 			if((tabGroup.title == null || tabGroup.title == "") &&  newTitle != ""){
 				console.info("delete default: ",newTitle);
 				tabGroup.title = newTitle;
-				tabGroup.default = false;
+				
+				if(tabGroup.default){
+					tabGroup.default = false;
+					for(var i=0; i < tabGroups.length;i++){
+					console.info("tabGroups[i].title: ",tabGroups[i].title);
+						if (tabGroups[i].title == null){
+							
+							tabGroups[i].default = true;
+							break;
+						}
+					}
+				}
 			}else if(newTitle == "" && getDefaultGroup() == null){
 				console.info("sadasdasd: ",newTitle);
+				tabGroup.title = newTitle;
 				tabGroup.default = true;
 			}
 			
@@ -155,25 +175,38 @@ var tabHandler;
 		chrome.tabs.onCreated.addListener(tabCreatedEventHandler)
 	}
 	function refreshListElement(tabId, changeInfo, tab){
+	console.info("refreshListElement: ",tabId)
+		
 		var parentGroup = getGroupByTab(tab);
-		if(null != parentGroup){
-			var updatedTablistElement = parentGroup.tabs[tab.id];
+		//if(null != parentGroup){
+			/*var updatedTablistElement = parentGroup.tabs[tab.id];
 			console.info("updatedTablistElement: ",updatedTablistElement.htmlElements);
 			updatedTablistElement.htmlElements.title.html(tab.title);
 			updatedTablistElement.htmlElements.url.html(tab.url);
 			updatedTablistElement.htmlElements.favicon.attr("src",tab.favIconUrl);
-			
-		}
+			*/
+		//}
+		
 	}
 	function tabCreatedEventHandler(tab){
-		var tabsList = addGroup();
+		console.info("tabCreatedEventHandler, ");
+		var defaultGroup = getDefaultGroup();
+		var listElement = createTabListElementContent(tab);
+		if(defaultGroup != null){
+			
+			defaultGroup.htmlElement.children("ol").append(listElement.htmlElements.li);
+			defaultGroup.tabs[tab.id] = tabs;
+			
+		}else{
+			var tabsList = addGroup();
+			tabsList.append(listElement.htmlElements.li);
+			tabGroups[tabGroups.length-1].tabs[tab.id] = tab;
+			console.info("the last  ",tabGroups[tabGroups.length-1].tabs);
+		}
 		
-		defaultTabGroup.tabs[tab.id] = createTabListElementContent(window.tabs[key]);
-	
-		defaultTabGroup.tabs[window.tabs[key].id].htmlElements.li
-									.appendTo(tabsList);
 	}
 	function getGroupByTab(tab) {
+	
 		for (var i = 0;i<tabGroups.length; i++) {
 			for ( var tabKey in tabGroups[i].tabs) {
 				if (tabGroups[i].tabs.hasOwnProperty(tabKey)) {
