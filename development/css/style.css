@@ -79,7 +79,7 @@ a {
 	margin-left: 20px;
 }
 
-.tabListElement div {
+.tabListElement .listElementContainer {
 	/* 	overflow:hidden; */
 	/* 	white-space:nowrap; */
 	/* 	text-overflow:ellipsis; */
@@ -90,19 +90,24 @@ a {
 	min-height: 10px;
 	min-width: 10px;
 	padding: 2.5px;
-	background-color: red;
+	background-color : rgb(71, 125, 194);
 	display: inline-block;
 	margin-left: 5px;
+	position: absolute;
+	margin-top: 2px;
 }
 
-.tabListElement .settings .handler {
+.tabListElement .settings .handler, .tabListElement .settings .closeButton {
 	height: 10px;
 	width: 10px;
 	background-color: green;
 	display: inline-block;
 	margin: 2px;
 }
+.tabListElement .settings .closeButton{
+	background-color: blue;
 
+}
 #addGroup {
 	padding: 10px;
 	/* 	margin: 0px 20px; */

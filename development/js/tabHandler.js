@@ -52,12 +52,12 @@ var tabHandler;
 		var link = jQuery("<a href=''></a>");
 		var title = jQuery("<span class='tabTitle'>" + tab.title + "</span>");
 		
-		var settings = jQuery('<div class="settings"></div>');
-		var dropDownHandler = jQuery("<div class='handler'></div>");
+		var settings = createListSettings();
 		var url = jQuery('<span class="tabListUrl">' + tab.url + '</span>');
+		
 		title.appendTo(link);
-		settings.appendTo(link);
-		dropDownHandler.appendTo(settings);	
+		settings.container.appendTo(link);
+		
 		url.appendTo(link);
 
 		link.click({tab : tab}, highlightTab);
@@ -78,8 +78,24 @@ var tabHandler;
 				url : url
 			}
 		});
+		
+		tabListElement.htmlElements.li.mouseover({tabListElement : tabListElement},function(evt){
+			 var htmlElements = evt.data.tabListElement.htmlElements;
+			htmlElements.settings.container.css({"display" : "inline-block"});
+			htmlElements.settings.container.animate({opacity : 1},200);
+			 htmlElements.url.animate({"margin-left" : "30px"},200);
+		});
+		
+		tabListElement.htmlElements.li.mouseleave({tabListElement : tabListElement},function(evt){
+			var htmlElements = evt.data.tabListElement.htmlElements;
 
-		dropDownHandler.mousedown({
+			htmlElements.settings.container.animate({opacity : 0},200,function(){
+					evt.data.tabListElement.htmlElements.settings.container.css({"display" : "none"});
+			});
+			htmlElements.url.animate({"margin-left" : "0px"},200);
+		});
+		
+		settings.dropDownHandler.mousedown({
 			tabListElement : tabListElement
 		}, function(ev) {
 			_grabbedRow = {
@@ -89,6 +105,22 @@ var tabHandler;
 		});
 
 		return tabListElement;
+	}
+	function createListSettings(){
+		var settings = jQuery('<div class="settings"></div>');
+		var dropDownHandler = jQuery("<div class='handler'></div>");
+		var closeButton = jQuery("<div class='closeButton'></div>");
+		
+		settings.css({"display" : "none",opacity : 0});
+		
+		dropDownHandler.appendTo(settings);	
+		closeButton.appendTo(settings);
+		
+		return {
+			container : settings,
+			dropDownHandler : dropDownHandler,
+			closeButton : closeButton
+		};
 	}
 	function highlightTab(event) {
 		event.preventDefault();
