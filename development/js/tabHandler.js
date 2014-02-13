@@ -20,22 +20,21 @@ var tabHandler;
 					var tabsList = addGroup();
 	
 					var row = 0;
-					var defaultTabGroup = tabGroups[0];
+					var initTabGroup = tabGroups[0];
 	
 					for (key in window.tabs) {
 						if (window.tabs.hasOwnProperty(key)
 								&& window.tabs[key].title != "TabHandler") {
 							row++;
 	
-							defaultTabGroup.tabs[window.tabs[key].id] = createTabListElementContent(window.tabs[key]);
+							initTabGroup.tabs[window.tabs[key].id] = createTabListElementContent(window.tabs[key]);
 	
-							defaultTabGroup.tabs[window.tabs[key].id].htmlElements.li
+							initTabGroup.tabs[window.tabs[key].id].htmlElements.li
 									.appendTo(tabsList);
 	
 							// chrome.tabs.remove(window.tabs[key].id);
 						}
 					}
-					defaultTabGroup.default = true;
 					
 				});
 				
@@ -46,7 +45,6 @@ var tabHandler;
 			return tabGroups;
 		}
 	};
-
 	function createTabListElementContent(tab, groupId) {
 
 		var link = jQuery("<a href=''></a>");
@@ -80,10 +78,10 @@ var tabHandler;
 		});
 		
 		tabListElement.htmlElements.li.mouseover({tabListElement : tabListElement},function(evt){
-			 var htmlElements = evt.data.tabListElement.htmlElements;
+			var htmlElements = evt.data.tabListElement.htmlElements;
 			htmlElements.settings.container.css({"display" : "inline-block"});
 			htmlElements.settings.container.animate({opacity : 1},200);
-			 htmlElements.url.animate({"margin-left" : "30px"},200);
+			htmlElements.url.animate({"margin-left" : "30px" } ,200);
 		});
 		
 		tabListElement.htmlElements.li.mouseleave({tabListElement : tabListElement},function(evt){
@@ -152,13 +150,6 @@ var tabHandler;
 		var newTabGroup = new TabGroup(groupId++, tabGroup);
 		tabGroups.push(newTabGroup);
 		
-		var defaultGroup = getDefaultGroup();
-		if(defaultGroup != null){
-			defaultGroup.default = false;
-		}
-				
-		newTabGroup.default = true;
-		
 		return tabsList;
 
 	}
@@ -167,29 +158,9 @@ var tabHandler;
 	
 		groupTitle.change(function(evt){
 			var tabGroup = getGroupByElement(tabGroupJ);
-			var newTitle = jQuery(this).children("input").val();
 			
-			if((tabGroup.title == null || tabGroup.title == "") &&  newTitle != ""){
-				console.info("delete default: ",newTitle);
-				tabGroup.title = newTitle;
+			tabGroup.title = jQuery(this).children("input").val();
 				
-				if(tabGroup.default){
-					tabGroup.default = false;
-					for(var i=0; i < tabGroups.length;i++){
-					console.info("tabGroups[i].title: ",tabGroups[i].title);
-						if (tabGroups[i].title == null){
-							
-							tabGroups[i].default = true;
-							break;
-						}
-					}
-				}
-			}else if(newTitle == "" && getDefaultGroup() == null){
-				console.info("sadasdasd: ",newTitle);
-				tabGroup.title = newTitle;
-				tabGroup.default = true;
-			}
-			
 		});
 	}
 	function handleDropEvent(event, ui) {
@@ -210,35 +181,27 @@ var tabHandler;
 	console.info("refreshListElement: ",tabId)
 		
 		var parentGroup = getGroupByTab(tab);
-		//if(null != parentGroup){
-			/*var updatedTablistElement = parentGroup.tabs[tab.id];
-			console.info("updatedTablistElement: ",updatedTablistElement.htmlElements);
-			updatedTablistElement.htmlElements.title.html(tab.title);
-			updatedTablistElement.htmlElements.url.html(tab.url);
-			updatedTablistElement.htmlElements.favicon.attr("src",tab.favIconUrl);
-			*/
-		//}
 		
 	}
+	//TODO: Need to refactor this.
 	function tabCreatedEventHandler(tab){
 		console.info("tabCreatedEventHandler, ");
-		var defaultGroup = getDefaultGroup();
-		var listElement = createTabListElementContent(tab);
-		if(defaultGroup != null){
-			
-			defaultGroup.htmlElement.children("ol").append(listElement.htmlElements.li);
-			defaultGroup.tabs[tab.id] = tabs;
-			
-		}else{
-			var tabsList = addGroup();
-			tabsList.append(listElement.htmlElements.li);
-			tabGroups[tabGroups.length-1].tabs[tab.id] = tab;
-			console.info("the last  ",tabGroups[tabGroups.length-1].tabs);
-		}
+//		var defaultGroup = getDefaultGroup();
+//		var listElement = createTabListElementContent(tab);
+//		if(defaultGroup != null){
+//			
+//			defaultGroup.htmlElement.children("ol").append(listElement.htmlElements.li);
+//			defaultGroup.tabs[tab.id] = tabs;
+//			
+//		}else{
+//			var tabsList = addGroup();
+//			tabsList.append(listElement.htmlElements.li);
+//			tabGroups[tabGroups.length-1].tabs[tab.id] = tab;
+//			console.info("the last  ",tabGroups[tabGroups.length-1].tabs);
+//		}
 		
 	}
 	function getGroupByTab(tab) {
-	
 		for (var i = 0;i<tabGroups.length; i++) {
 			for ( var tabKey in tabGroups[i].tabs) {
 				if (tabGroups[i].tabs.hasOwnProperty(tabKey)) {
@@ -248,17 +211,6 @@ var tabHandler;
 				}
 			}
 		}
-		/* for ( var key in tabGroups) {
-			if (tabGroups.hasOwnProperty(key)) {
-				for ( var tabKey in tabGroups[key].tabs) {
-					if (tabGroups[key].tabs.hasOwnProperty(tabKey)) {
-						if (tab.id == tabGroups[key].tabs[tabKey].tab.id) {
-							return tabGroups[key];
-						}
-					}
-				}
-			}
-		} */
 		return null;
 	}
 	function getGroupByElement(element) {
@@ -267,27 +219,6 @@ var tabHandler;
 				return tabGroups[i];
 			}
 		}
-	
-		/* for ( var key in tabGroups) {
-			if (tabGroups.hasOwnProperty(key)) {
-				if (tabGroups[key].htmlElement.attr("id") == element.attr("id")) {
-					return tabGroups[key];
-				}
-			}
-		} */
-		return null;
-	}
-	function getDefaultGroup(){
-		for ( var i = 0;i<tabGroups.length; i++) {
-			if ( tabGroups[i].default) {
-				return tabGroups[i];
-			}
-		}
-		/* for ( var key in tabGroups) {
-			if (tabGroups.hasOwnProperty(key) && tabGroups[key].default) {
-				return tabGroups[key];
-			}
-		 }*/
 		return null;
 	}
 	
